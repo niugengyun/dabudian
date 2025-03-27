@@ -16,10 +16,18 @@
 │   ├── icon/         # 应用图标
 │   └── README.md     # 守护进程说明文档
 │
-└── .gitignore        # Git 忽略配置
+├── restful-api/      # 后端 API 服务
+│   ├── src/         # 源代码
+│   ├── dist/        # 编译后的代码
+│   ├── package.json # 项目依赖配置
+│   └── README.md    # API 服务说明文档
+│
+└── .gitignore       # Git 忽略配置
 ```
 
 ## 快速开始
+
+### 前端开发
 
 1. 进入前端目录
 ```bash
@@ -36,10 +44,46 @@ npm install
 npm start
 ```
 
+### 后端开发
+
+1. 进入后端目录
+```bash
+cd restful-api
+```
+
+2. 安装依赖
+```bash
+npm install
+```
+
+3. 启动开发环境
+```bash
+npm run dev
+```
+
+### 进程守护程序
+
+1. 进入守护程序目录
+```bash
+cd app-monitor
+```
+
+2. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+3. 启动守护程序
+```bash
+python main.py
+```
+
 ## 详细文档
 
 - [前端项目文档](frontend/README.md)
 - [进程守护程序文档](app-monitor/README.md)
+- [API 服务文档](restful-api/README.md)
+- [API 接口文档](restful-api/API.md)
 
 ## 许可证
 
