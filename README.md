@@ -80,13 +80,13 @@ python main.py
 
 ## 详细文档
 
-- [前端项目文档](frontend/README.md)
-- [进程守护程序文档](app-monitor/README.md)
-- [API 服务文档](restful-api/README.md)
-- [API 接口文档](restful-api/API.md)
+- [前端项目文档](https://github.com/niugengyun/dabudian-frontend/blob/main/README.md)
+- [进程守护程序文档](https://github.com/niugengyun/dabudian-app-monitor/blob/main/README.md)
+- [API 服务文档](https://github.com/niugengyun/dabudian-api/blob/main/README.md)
+- [API 接口文档](https://github.com/niugengyun/dabudian-api/blob/main/API.md)
 
 ## 许可证
 
 版权所有 © 2024 大不点直播助手
 
-本软件仅供个人学习和个人使用，严禁用于商业目的。详细许可证信息请参考 [前端项目文档](frontend/README.md#许可证)。 
+本软件仅供个人学习和个人使用，严禁用于商业目的。详细许可证信息请参考 [前端项目文档](https://github.com/niugengyun/dabudian-frontend/blob/main/README.md#许可证)。 
