@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>大不点</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+        /* 左侧按钮栏样式 */
+        .sidebar {
+            width: 64px;
+            height: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-btn {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            border: none;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        .sidebar-btn:hover {
+            background-color: #e6f7ff;
+            transform: translateY(-2px);
+        }
+        .sidebar-btn:active {
+            transform: translateY(0);
+        }
+        .sidebar-icon {
+            font-size: 20px;
+            margin-bottom: 0;
+        }
+        .sidebar-text {
+            font-size: 12px;
+            color: #333;
+        }
+        /* 右侧内容区域样式 */
+        .content {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 标签页容器 */
+        .tabs-container {
+            display: flex;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+            height: 40px;
+            align-items: center;
+            padding: 0 8px;
+        }
+        /* 标签页 */
+        .tab {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            height: 32px;
+            background-color: #e0e0e0;
+            border-radius: 6px 6px 0 0;
+            margin-right: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tab.active {
+            background-color: #fff;
+            font-weight: 500;
+        }
+        .tab-close {
+            margin-left: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .tab-close::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' stroke='white' stroke-width='2'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .tab-close:hover {
+            background-color: #999;
+        }
+        /* 新增标签按钮 */
+        .new-tab {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+        }
+        .new-tab:hover {
+            background-color: #ddd;
+        }
+        /* Webview 容器 */
+        .webview-container {
+            flex: 1;
+            position: relative;
+        }
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 300px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e8e8e8;
+            padding-bottom: 8px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .form-item {
+            margin-bottom: 16px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        select {
+            width: 100%;
+            height: 32px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+        }
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .btn {
+            height: 32px;
+            padding: 4px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            color: rgba(0, 0, 0, 0.88);
+            font-size: 14px;
+        }
+        .btn:hover {
+            border-color: #4096ff;
+            color: #4096ff;
+        }
+        .btn-primary {
+            background: #1677ff;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #4096ff;
+            color: white !important;
+            border: none;
+        }
+        .webview-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+        }
+        .webview-wrapper.active {
+            display: block;
+        }
+        .webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧按钮栏 -->
+    <div class="sidebar">
+        <button class="sidebar-btn" id="addButton">
+            <span class="sidebar-icon">+</span>
+            <span class="sidebar-text">添加</span>
+        </button>
+        <button class="sidebar-btn" id="serviceButton">
+            <span class="sidebar-icon">👨‍💻</span>
+            <span class="sidebar-text">客服</span>
+        </button>
+        <button class="sidebar-btn" id="settingsButton">
+            <span class="sidebar-icon">⚙️</span>
+            <span class="sidebar-text">设置</span>
+        </button>
+        <button class="sidebar-btn" id="aboutButton">
+            <span class="sidebar-icon">ℹ️</span>
+            <span class="sidebar-text">关于</span>
+        </button>
+    </div>
+    
+    <!-- 右侧内容区域 -->
+    <div class="content">
+        <!-- 标签页栏 -->
+        <div class="tabs-container" id="tabsContainer">
+            <!-- 这里将动态添加标签页 -->
+            <div class="new-tab" id="newTabButton">+</div>
+        </div>
+        
+        <!-- Webview 容器 -->
+        <div class="webview-container" id="webviewContainer">
+            <!-- 这里将动态添加 webview -->
+        </div>
+    </div>
+
+    <script>
+        console.log('主窗口已加载');
+        
+        // 全局变量
+        let tabCounter = 0;
+        let tabs = [];
+        let activeTabId = null;
+        
+        // 在页面加载完成后注册监听器
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('主窗口 DOM 加载完成');
+            
+            // 使用 preload 暴露的 API
+            if (window.electronAPI) {
+                console.log('electronAPI 可用');
+                
+                // 加载持久化的标签页数据
+                const tabsData = await window.electronAPI.loadTabsData();
+                console.log('加载到的标签页数据:', tabsData);
+                
+                // 如果有持久化的标签页数据，创建对应的标签页
+                if (tabsData && tabsData.tabs && tabsData.tabs.length > 0) {
+                    tabsData.tabs.forEach(tab => {
+                        createTabFromData(tab);
+                    });
+                }
+                
+                // 监听标签页添加事件
+                window.electronAPI.onTabAdded((tab) => {
+                    console.log('收到新标签页数据:', tab);
+                    createTabFromData(tab);
+                });
+                
+                // 监听标签页删除事件
+                window.electronAPI.onTabRemoved((tabId) => {
+                    console.log('收到标签页删除事件:', tabId);
+                    removeTab(tabId);
+                });
+                
+                // 监听标签页更新事件
+                window.electronAPI.onTabUpdated((tab) => {
+                    console.log('收到标签页更新事件:', tab);
+                    updateTab(tab);
+                });
+
+                // 监听导航到主页事件
+                window.electronAPI.onNavigateToHome(() => {
+                    console.log('收到导航到主页事件');
+                    const webview = document.getElementById(activeTabId);
+                    if (webview) {
+                        webview.src = 'https://zs.kwaixiaodian.com/page/helper?from=seller_pc_home_page';
+                    }
+                });
+
+                // 监听刷新标签页事件
+                window.electronAPI.onRefreshActiveTab(() => {
+                    console.log('收到刷新标签页事件');
+                    const webview = document.getElementById(activeTabId);
+                    if (webview) {
+                        webview.reload();
+                    }
+                });
+
+                // 监听调试模式切换事件
+                window.electronAPI.onToggleDebugMode(() => {
+                    console.log('收到切换调试模式事件');
+                    const webview = document.getElementById(activeTabId);
+                    if (webview) {
+                        if (webview.isDevToolsOpened()) {
+                            webview.closeDevTools();
+                        } else {
+                            webview.openDevTools();
+                        }
+                    }
+                });
+
+                // 监听显示退出模态框事件
+                window.electronAPI.onShowLogoutModal(() => {
+                    console.log('收到显示退出模态框事件');
+                    showLogoutModal();
+                });
+
+                // 监听显示设置模态框事件
+                window.electronAPI.onShowSettingsModal(() => {
+                    console.log('收到显示设置模态框事件');
+                    showSettingsModal();
+                });
+            } else {
+                console.error('electronAPI 不可用');
+            }
+
+            // 添加新标签按钮点击事件
+            document.getElementById('newTabButton').addEventListener('click', () => {
+                if (window.electronAPI) {
+                    window.electronAPI.sidebarAction('add');
+                }
+            });
+
+            // 添加按钮点击事件
+            document.getElementById('addButton').addEventListener('click', () => {
+                console.log('点击添加按钮');
+                if (window.electronAPI) {
+                    window.electronAPI.sidebarAction('add');
+                }
+            });
+
+            document.getElementById('serviceButton').addEventListener('click', () => {
+                console.log('点击客服按钮');
+                if (window.electronAPI) {
+                    window.electronAPI.sidebarAction('service');
+                }
+            });
+
+            document.getElementById('settingsButton').addEventListener('click', () => {
+                console.log('点击设置按钮');
+                if (window.electronAPI) {
+                    window.electronAPI.sidebarAction('settings');
+                }
+            });
+
+            document.getElementById('aboutButton').addEventListener('click', () => {
+                console.log('点击关于按钮');
+                if (window.electronAPI) {
+                    window.electronAPI.sidebarAction('about');
+                }
+            });
+        });
+        
+        // 从数据创建标签页
+        function createTabFromData(tabData) {
+            console.log('创建标签页:', tabData);
+            const tabId = tabData.id;
+            
+            // 检查是否已存在相同 ID 的标签页
+            if (tabs.some(tab => tab.id === tabId)) {
+                console.log('标签页已存在，跳过创建:', tabId);
+                return;
+            }
+            
+            // 创建标签页元素
+            const tab = document.createElement('div');
+            tab.className = 'tab';
+            tab.dataset.tabId = tabId;
+            tab.innerHTML = `
+                <span class="tab-title">${tabData.remark}</span>
+                <span class="tab-close"></span>
+            `;
+            
+            // 创建 webview 元素
+            const webviewWrapper = document.createElement('div');
+            webviewWrapper.className = 'webview-wrapper';
+            webviewWrapper.dataset.tabId = tabId;
+            
+            const webview = createWebviewElement(tabData);
+            
+            // 添加 webview 加载完成事件监听
+            webview.addEventListener('dom-ready', () => {
+                console.log(`webview ${tabData.id} 加载完成`);
+                // 如果是第一个标签页，确保它显示
+                if (tabs.length === 1) {
+                    webviewWrapper.style.display = 'block';
+                }
+            });
+            
+            // 添加事件监听器
+            tab.addEventListener('click', () => {
+                console.log('点击标签页:', tabId);
+                switchTab(tabId, true);  // 明确指定是用户点击
+            });
+            tab.addEventListener('dblclick', () => {
+                if (window.electronAPI) {
+                    window.electronAPI.editTab(tabId);
+                }
+            });
+            tab.querySelector('.tab-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // 检查是否只剩下一个标签页，如果是则禁止关闭
+                if (tabs.length <= 1) {
+                    alert('无法关闭最后一个标签页');
+                    return;
+                }
+                
+                if (window.electronAPI) {
+                    window.electronAPI.showConfirmDialog('确认关闭', '确定要关闭这个标签页吗？')
+                        .then(confirmed => {
+                            if (confirmed) {
+                                window.electronAPI.removeTab(tabId);
+                            }
+                        });
+                } else {
+                    removeTab(tabId);
+                }
+            });
+            
+            // 添加到 DOM
+            document.getElementById('tabsContainer').insertBefore(tab, document.getElementById('newTabButton'));
+            webviewWrapper.appendChild(webview);
+            document.getElementById('webviewContainer').appendChild(webviewWrapper);
+            
+            // 更新数据
+            tabs.push({
+                id: tabId,
+                element: tab,
+                webview: webview,
+                data: tabData
+            });
+            
+            console.log('标签页创建完成:', tabId);
+            
+            // 如果是第一个标签页，激活它
+            if (tabs.length === 1) {
+                switchTab(tabId);
+            }
+        }
+        
+        // 切换标签页
+        function switchTab(tabId, isUserClick = false) {
+            console.log('切换标签页:', tabId, isUserClick ? '(用户点击)' : '(初始化)');
+            // 更新活动标签页
+            tabs.forEach(tab => {
+                if (tab.id === tabId) {
+                    tab.element.classList.add('active');
+                    tab.webview.parentElement.classList.add('active');
+                    tab.webview.parentElement.style.display = 'block';  // 确保显示
+                    activeTabId = tabId;
+                    
+                    // 只在用户点击时通知主进程更新活动的webview
+                    if (isUserClick && window.electronAPI) {
+                        window.electronAPI.updateActiveWebview(tabId);
+                    }
+                } else {
+                    tab.element.classList.remove('active');
+                    tab.webview.parentElement.classList.remove('active');
+                    tab.webview.parentElement.style.display = 'none';  // 隐藏其他标签页
+                }
+            });
+        }
+        
+        // 删除标签页
+        function removeTab(tabId) {
+            // 找到要删除的标签页
+            const tabIndex = tabs.findIndex(tab => tab.id === tabId);
+            if (tabIndex === -1) return;
+            
+            // 从 DOM 中移除
+            tabs[tabIndex].element.remove();
+            tabs[tabIndex].webview.parentElement.remove();
+            
+            // 从数组中移除
+            tabs.splice(tabIndex, 1);
+            
+            // 如果删除的是当前活动的标签页，激活下一个标签页
+            if (activeTabId === tabId && tabs.length > 0) {
+                switchTab(tabs[0].id);
+            }
+        }
+
+        // 更新标签页
+        function updateTab(tabData) {
+            // 找到要更新的标签页
+            const tab = tabs.find(tab => tab.id === tabData.id);
+            if (!tab) return;
+            
+            // 更新标签页标题
+            tab.element.querySelector('.tab-title').textContent = tabData.remark;
+            
+            // 更新标签页数据
+            tab.data = tabData;
+        }
+
+        // 显示设置模态框
+        async function showSettingsModal() {
+            console.log('开始显示设置模态框');
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'settingsModal';
+            
+            // 获取当前标签页数据
+            const currentTab = tabs.find(tab => tab.id === activeTabId);
+            if (!currentTab) {
+                console.error('没有找到当前活动标签页');
+                return;
+            }
+            console.log('当前标签页数据:', currentTab.data);
+            console.log('当前标签页 service 字段:', currentTab.data.service, '类型:', typeof currentTab.data.service);
+
+            // 获取服务数据
+            let services = [];
+            try {
+                console.log('开始读取服务数据');
+                const serviceData = await window.electronAPI.readServiceData();
+                console.log('读取到的服务数据:', serviceData);
+                services = serviceData.services || [];
+                console.log('处理后的服务列表:', services);
+            } catch (error) {
+                console.error('读取服务数据失败:', error);
+            }
+
+            // 生成选项HTML
+            const optionsHtml = services.map(service => {
+                console.log('处理服务项:', service);
+                // 确保类型匹配
+                const serviceId = String(service.id);
+                const currentService = String(currentTab.data.service);
+                const isSelected = currentTab.data.service && currentService === serviceId;
+                console.log('比较:', {
+                    serviceId,
+                    currentService,
+                    isSelected
+                });
+                return `<option value="${serviceId}" ${isSelected ? 'selected' : ''}>${service.group}</option>`;
+            }).join('');
+            console.log('生成的选项HTML:', optionsHtml);
+
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>设置</h2>
+                    </div>
+                    <div class="form-item">
+                        <label for="sceneSelect">选择场控</label>
+                        <select id="sceneSelect">
+                            <option value="">请选择场控</option>
+                            ${optionsHtml}
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn" onclick="cancelSettings()">取消</button>
+                        <button class="btn btn-primary" onclick="saveSettings()">保存</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            console.log('设置模态框已添加到页面');
+
+            // 点击模态框背景关闭
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeSettingsModal();
+                }
+            });
+        }
+
+        // 保存设置
+        async function saveSettings() {
+            console.log('保存设置');
+            const scene = document.getElementById('sceneSelect').value;
+            
+            if (window.electronAPI) {
+                // 获取当前标签页数据
+                const currentTab = tabs.find(tab => tab.id === activeTabId);
+                if (!currentTab) {
+                    console.error('没有找到当前活动标签页');
+                    return;
+                }
+
+                // 更新标签页数据
+                const updatedTab = {
+                    ...currentTab.data,
+                    // 如果选择的是空值，则设置 service 为 null
+                    service: scene || null
+                };
+
+                // 保存更新后的标签页数据
+                await window.electronAPI.updateTab(updatedTab);
+                
+                // 更新本地标签页数据
+                updateTab(updatedTab);
+                
+                closeSettingsModal();
+            }
+        }
+
+        // 取消设置
+        function cancelSettings() {
+            console.log('取消设置');
+            closeSettingsModal();
+        }
+
+        // 关闭设置模态框
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // 创建新的 webview 元素
+        function createWebviewElement(tabData) {
+            const webview = document.createElement('webview');
+            webview.setAttribute('src', `https://zs.kwaixiaodian.com/page/helper?from=seller_pc_home_page&tabId=${tabData.id}`);
+            webview.setAttribute('partition', `persist:${tabData.id}`);
+            webview.setAttribute('webpreferences', 'contextIsolation=yes, nodeIntegration=yes');
+            webview.setAttribute('allowpopups', '');
+            webview.setAttribute('preload', './preload.js');
+            webview.setAttribute('id', tabData.id);
+            webview.setAttribute('class', 'webview');
+            // 移除默认的 display: none 样式
+            return webview;
+        }
+    </script>
+</body>
+</html> 
