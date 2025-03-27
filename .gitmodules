@@ -1,0 +1,9 @@
+[submodule "app-monitor"]
+	path = app-monitor
+	url = git@github.com:niugengyun/dabudian-app-monitor.git
+[submodule "frontend"]
+	path = frontend
+	url = git@github.com:niugengyun/dabudian-frontend.git
+[submodule "restful-api"]
+	path = restful-api
+	url = git@github.com:niugengyun/dabudian-api.git
